@@ -22,6 +22,6 @@ message UserLoginReq{
 
 service Auths{
     rpc Register(UserRegisterReq) returns (User){}
-    rpc Login(UserReq) returns (User){}
+    rpc Login(UserLoginReq) returns (User){}
 }
 
