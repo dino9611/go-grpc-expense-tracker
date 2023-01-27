@@ -13,7 +13,7 @@ func main() {
 
 	h := handler.New(authServiceClient)
 
-	router.POST("register", h.Register)
+	router.POST("/register", h.Register)
 
 	router.Run(":8080")
 }

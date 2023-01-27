@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"grpc-finance-app/gateway/internal/dto"
 	authpb "grpc-finance-app/proto"
 	"net/http"
@@ -21,6 +22,7 @@ func (h *Handler) Register(ctx *gin.Context) {
 		Email:    authReq.Email,
 	})
 	if err != nil {
+		fmt.Println("tesaja : ", err)
 		ctx.Error(err)
 		return
 	}
