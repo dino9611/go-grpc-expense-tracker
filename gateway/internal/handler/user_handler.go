@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"grpc-finance-app/gateway/internal/dto"
 	authpb "grpc-finance-app/proto"
 	"net/http"
@@ -22,8 +21,9 @@ func (h *Handler) Register(ctx *gin.Context) {
 		Email:    authReq.Email,
 	})
 	if err != nil {
-		fmt.Println("tesaja : ", err)
-		ctx.Error(err)
+		// fmt.Println("tesaja : ", err)
+		// ctx.Error(err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "error", "err": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "success", "data": user})

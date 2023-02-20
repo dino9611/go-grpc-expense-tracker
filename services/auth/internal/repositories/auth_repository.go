@@ -28,21 +28,35 @@ func (ar *authRepo) AddUser(ctx context.Context, userData *models.User) (*models
 
 	if err := ar.db.WithContext(ctx).Create(&userData).Error; err != nil {
 
-		// var pgErr *pgconn.PgError
-		pgErr := err.(*pgconn.PgError)
+		var pgErr *pgconn.PgError
+
+		// fmt.Println("tes", err)
 		fmt.Println("tes", err)
-		if errors.Is(err, pgErr) {
+		if errors.As(err, &pgErr) {
 			fmt.Println("tes2", err)
 			switch pgErr.Code {
 			case "23505": // duplicate key error
 				fmt.Println("tes2", err)
-				return nil, fmt.Errorf("unique violation %w", err)
+				return nil, NewErrorWrapper(CodeClientError, "duplicate errror", fmt.Errorf("unique violation %w", err))
 			default:
 
-				return nil, fmt.Errorf("pg error %w", err)
+				return nil, NewErrorWrapper(CodeServerError, "pg error", fmt.Errorf("pg error %w", err))
 			}
 
 		}
+		// pgErr := err.(*pgconn.PgError)
+		// if errors.Is(err, pgErr) {
+		// 	fmt.Println("tes2", err)
+		// 	switch pgErr.Code {
+		// 	case "23505": // duplicate key error
+		// 		fmt.Println("tes2", err)
+		// 		return nil, fmt.Errorf("unique violation %w", err)
+		// 	default:
+
+		// 		return nil, fmt.Errorf("pg error %w", err)
+		// 	}
+
+		// }
 	}
 
 	return userData, nil
