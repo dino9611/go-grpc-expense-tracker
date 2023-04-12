@@ -60,9 +60,9 @@ func (au *authUseCase) Get(ctx context.Context, authDto *req.AuthLoginReqDto) (*
 		return nil, fmt.Errorf("errror %w", err)
 	}
 
-	isError := CheckPasswordHash(authDto.Password, result.Password)
+	isPass := CheckPasswordHash(authDto.Password, result.Password)
 
-	if !isError {
+	if !isPass {
 		return nil, errors.New("password wrong")
 	}
 
