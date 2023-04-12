@@ -14,6 +14,7 @@ func main() {
 	h := handler.New(authServiceClient)
 
 	router.POST("/register", h.Register)
+	router.POST("/login", h.Login)
 
 	router.Run(":8080")
 }

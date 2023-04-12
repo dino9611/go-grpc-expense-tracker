@@ -22,8 +22,6 @@ func main() {
 	authUseCase := usecases.NewAuthUseCase(authRepo)
 	handler := handler.New(authUseCase)
 
-	// listen, err := net.Listen("tcp", fmt.Sprintf(":%v", cfg.Application.Port))
-
 	s := grpc.NewServer()
 	authpb.RegisterAuthsServer(s, handler)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", cfg.Application.Port))

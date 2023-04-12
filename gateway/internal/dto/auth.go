@@ -6,6 +6,11 @@ type AuthReq struct {
 	Password string `json:"password" validate:"required,alphanumunicode"`
 }
 
+type AuthLoginReq struct {
+	Username string `json:"username" validate:"required,alphanumunicode"`
+	Password string `json:"password" validate:"required,alphanumunicode"`
+}
+
 type AuthRes struct {
 	Id       int64  `json:"id" `
 	Email    string `json:"email" `

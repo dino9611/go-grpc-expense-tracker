@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"grpc-finance-app/services/auth/internal/models"
+	"log"
 
 	"github.com/jackc/pgconn"
 	"gorm.io/gorm"
@@ -12,6 +13,7 @@ import (
 
 type IAuthRepo interface {
 	AddUser(ctx context.Context, userData *models.User) (*models.User, error)
+	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 }
 
 type authRepo struct {
@@ -44,21 +46,24 @@ func (ar *authRepo) AddUser(ctx context.Context, userData *models.User) (*models
 			}
 
 		}
-		// pgErr := err.(*pgconn.PgError)
-		// if errors.Is(err, pgErr) {
-		// 	fmt.Println("tes2", err)
-		// 	switch pgErr.Code {
-		// 	case "23505": // duplicate key error
-		// 		fmt.Println("tes2", err)
-		// 		return nil, fmt.Errorf("unique violation %w", err)
-		// 	default:
 
-		// 		return nil, fmt.Errorf("pg error %w", err)
-		// 	}
-
-		// }
 	}
 
 	return userData, nil
+}
 
+func (ar *authRepo) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+	var user *models.User
+	result := ar.db.Where("username = ?", username).First(&user)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return nil, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, errors.New("username not found")
+	}
+
+	return user, nil
 }

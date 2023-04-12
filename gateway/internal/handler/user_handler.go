@@ -29,3 +29,25 @@ func (h *Handler) Register(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "success", "data": user})
 
 }
+
+func (h *Handler) Login(ctx *gin.Context) {
+	var authLogindto dto.AuthLoginReq
+	if err := ctx.ShouldBindJSON(&authLogindto); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"messsage": "validate error", "error": err.Error()})
+		return
+	}
+
+	user, err := h.authServiceClient.Login(ctx, &authpb.UserLoginReq{
+		Username: authLogindto.Username,
+		Password: authLogindto.Password,
+	})
+
+	if err != nil {
+		// fmt.Println("tesaja : ", err)
+		// ctx.Error(err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "error", "err": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "login success", "data": user})
+
+}

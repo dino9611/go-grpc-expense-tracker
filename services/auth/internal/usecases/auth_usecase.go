@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	authpb "grpc-finance-app/proto"
 	"grpc-finance-app/services/auth/internal/dto/req"
@@ -11,8 +12,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 type IAuthUseCase interface {
 	Create(ctx context.Context, authDto *req.AuthReqDto) (*authpb.User, error)
+	Get(ctx context.Context, authDto *req.AuthLoginReqDto) (*authpb.User, error)
 }
 
 type authUseCase struct {
@@ -29,7 +36,7 @@ func (au *authUseCase) Create(ctx context.Context, authDto *req.AuthReqDto) (*au
 	hashpass, errbcrypt := bcrypt.GenerateFromPassword([]byte(authDto.Password), 10)
 
 	if errbcrypt != nil {
-		return nil, fmt.Errorf("bcript error %v", errbcrypt)
+		return nil, fmt.Errorf("bcrypt error %v", errbcrypt)
 	}
 	userData := &models.User{
 		Username: authDto.Username,
@@ -44,4 +51,21 @@ func (au *authUseCase) Create(ctx context.Context, authDto *req.AuthReqDto) (*au
 	}
 
 	return result.ToPb(), nil
+}
+
+func (au *authUseCase) Get(ctx context.Context, authDto *req.AuthLoginReqDto) (*authpb.User, error) {
+	result, err := au.authRepo.GetUserByUsername(ctx, authDto.Username)
+
+	if err != nil {
+		return nil, fmt.Errorf("errror %w", err)
+	}
+
+	isError := CheckPasswordHash(authDto.Password, result.Password)
+
+	if !isError {
+		return nil, errors.New("password wrong")
+	}
+
+	return result.ToPb(), nil
+
 }
