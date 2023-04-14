@@ -2,10 +2,14 @@ package handler
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	authpb "grpc-finance-app/proto"
 	"grpc-finance-app/services/auth/internal/dto/req"
-	"log"
+	"grpc-finance-app/services/auth/internal/errs"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 func (h *Handler) Register(ctx context.Context, in *authpb.UserRegisterReq) (*authpb.User, error) {
@@ -29,10 +33,14 @@ func (h *Handler) Login(ctx context.Context, in *authpb.UserLoginReq) (*authpb.U
 		Password: in.Password,
 	}
 
-	fmt.Println(authdto)
 	result, err := h.authUseCase.Get(ctx, authdto)
+
 	if err != nil {
-		log.Println("tes erro")
+		if errors.Is(err, gorm.ErrRecordNotFound) || errors.Is(err, errs.ErrorPassWrong) {
+			err = status.Error(codes.NotFound, "user not found")
+			return nil, err
+		}
+		err = status.Error(codes.Internal, "internal error")
 		return nil, err
 	}
 

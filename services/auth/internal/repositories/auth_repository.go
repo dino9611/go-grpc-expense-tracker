@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"grpc-finance-app/services/auth/internal/models"
-	"log"
 
 	"github.com/jackc/pgconn"
 	"gorm.io/gorm"
@@ -31,14 +30,9 @@ func (ar *authRepo) AddUser(ctx context.Context, userData *models.User) (*models
 	if err := ar.db.WithContext(ctx).Create(&userData).Error; err != nil {
 
 		var pgErr *pgconn.PgError
-
-		// fmt.Println("tes", err)
-		fmt.Println("tes", err)
 		if errors.As(err, &pgErr) {
-			fmt.Println("tes2", err)
 			switch pgErr.Code {
 			case "23505": // duplicate key error
-				fmt.Println("tes2", err)
 				return nil, NewErrorWrapper(CodeClientError, "duplicate errror", fmt.Errorf("unique violation %w", err))
 			default:
 
@@ -56,13 +50,15 @@ func (ar *authRepo) GetUserByUsername(ctx context.Context, username string) (*mo
 	var user *models.User
 	result := ar.db.Where("username = ?", username).First(&user)
 
-	if result.Error != nil {
-		log.Println(result.Error)
-		return nil, result.Error
+	if result.RowsAffected <= 0 {
+		if result.Error != nil {
+			return nil, result.Error
+		}
+		return nil, gorm.ErrRecordNotFound
 	}
 
-	if result.RowsAffected == 0 {
-		return nil, errors.New("username not found")
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return user, nil

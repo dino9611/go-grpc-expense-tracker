@@ -2,10 +2,10 @@ package usecases
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	authpb "grpc-finance-app/proto"
 	"grpc-finance-app/services/auth/internal/dto/req"
+	"grpc-finance-app/services/auth/internal/errs"
 	"grpc-finance-app/services/auth/internal/models"
 	"grpc-finance-app/services/auth/internal/repositories"
 
@@ -57,13 +57,13 @@ func (au *authUseCase) Get(ctx context.Context, authDto *req.AuthLoginReqDto) (*
 	result, err := au.authRepo.GetUserByUsername(ctx, authDto.Username)
 
 	if err != nil {
-		return nil, fmt.Errorf("errror %w", err)
+		return nil, fmt.Errorf("error from repo : %w", err)
 	}
 
-	isPass := CheckPasswordHash(authDto.Password, result.Password)
+	isPassMatch := CheckPasswordHash(authDto.Password, result.Password)
 
-	if !isPass {
-		return nil, errors.New("password wrong")
+	if !isPassMatch {
+		return nil, fmt.Errorf("error from usecase (hash) : %w", errs.ErrorPassWrong)
 	}
 
 	return result.ToPb(), nil

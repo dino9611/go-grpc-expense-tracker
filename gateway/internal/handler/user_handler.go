@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (h *Handler) Register(ctx *gin.Context) {
@@ -43,9 +45,22 @@ func (h *Handler) Login(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		// fmt.Println("tesaja : ", err)
-		// ctx.Error(err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "error", "err": err.Error()})
+		e, ok := status.FromError(err)
+		if ok {
+			switch e.Code() {
+			case codes.Internal:
+				ctx.JSON(http.StatusInternalServerError, gin.H{"message": "service internal error", "err": e.Message()})
+				return
+			case codes.NotFound:
+				ctx.JSON(http.StatusBadRequest, gin.H{"message": "service data not found", "err": e.Message()})
+				return
+			default:
+				ctx.JSON(http.StatusInternalServerError, gin.H{"message": "service unknown error", "err": e.Message()})
+				return
+			}
+		}
+
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "error in gateway (client rpc) ", "err": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "login success", "data": user})
