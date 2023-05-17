@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
-	"fmt"
+	"grpc-finance-app/services/auth/internal/errs"
 	"grpc-finance-app/services/auth/internal/models"
 
 	"github.com/jackc/pgconn"
@@ -33,12 +33,11 @@ func (ar *authRepo) AddUser(ctx context.Context, userData *models.User) (*models
 		if errors.As(err, &pgErr) {
 			switch pgErr.Code {
 			case "23505": // duplicate key error
-				return nil, NewErrorWrapper(CodeClientError, "duplicate errror", fmt.Errorf("unique violation %w", err))
+				return nil, errs.ErrorUsernameExist
 			default:
 
-				return nil, NewErrorWrapper(CodeServerError, "pg error", fmt.Errorf("pg error %w", err))
+				return nil, errs.ErrorDbPg
 			}
-
 		}
 
 	}

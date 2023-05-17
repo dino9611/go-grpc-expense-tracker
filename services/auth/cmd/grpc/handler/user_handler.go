@@ -20,6 +20,14 @@ func (h *Handler) Register(ctx context.Context, in *authpb.UserRegisterReq) (*au
 	}
 	result, err := h.authUseCase.Create(ctx, authdto)
 	if err != nil {
+		if errors.Is(err, errs.ErrorUsernameExist) {
+			err = status.Error(codes.AlreadyExists, "user already exist")
+			return nil, err
+		} else if errors.Is(err, errs.ErrorUsernameExist) {
+			err = status.Error(codes.Internal, "db error")
+			return nil, err
+		}
+		err = status.Error(codes.Internal, "internal error")
 		return nil, err
 	}
 

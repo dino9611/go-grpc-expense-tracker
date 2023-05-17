@@ -36,7 +36,7 @@ func (au *authUseCase) Create(ctx context.Context, authDto *req.AuthReqDto) (*au
 	hashpass, errbcrypt := bcrypt.GenerateFromPassword([]byte(authDto.Password), 10)
 
 	if errbcrypt != nil {
-		return nil, fmt.Errorf("bcrypt error %v", errbcrypt)
+		return nil, fmt.Errorf("error from usecase (hash) : %w", errs.ErrorHashBcrypt)
 	}
 	userData := &models.User{
 		Username: authDto.Username,
@@ -47,7 +47,7 @@ func (au *authUseCase) Create(ctx context.Context, authDto *req.AuthReqDto) (*au
 	result, err := au.authRepo.AddUser(ctx, userData)
 
 	if err != nil {
-		return nil, fmt.Errorf("errror %w", err)
+		return nil, fmt.Errorf("error from repo : %w", err)
 	}
 
 	return result.ToPb(), nil
