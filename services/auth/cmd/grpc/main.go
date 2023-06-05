@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	authpb "grpc-finance-app/proto"
 	"grpc-finance-app/services/auth/cmd/grpc/handler"
 	"grpc-finance-app/services/auth/internal/config"
 	"grpc-finance-app/services/auth/internal/db"
@@ -11,6 +10,8 @@ import (
 	"log"
 	"net"
 	"os"
+
+	authpb "github.com/dino9611-grpc-expense-app/grpc-expense-proto/proto"
 
 	"google.golang.org/grpc"
 )

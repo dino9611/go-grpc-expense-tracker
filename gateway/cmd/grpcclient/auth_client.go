@@ -2,8 +2,9 @@ package grpcclient
 
 import (
 	"fmt"
-	authpb "grpc-finance-app/proto"
 	"log"
+
+	authpb "github.com/dino9611-grpc-expense-app/grpc-expense-proto/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

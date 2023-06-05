@@ -3,7 +3,7 @@ package handler
 import (
 	"grpc-finance-app/services/auth/internal/usecases"
 
-	authpb "grpc-finance-app/proto"
+	authpb "github.com/dino9611-grpc-expense-app/grpc-expense-proto/proto"
 )
 
 type Handler struct {

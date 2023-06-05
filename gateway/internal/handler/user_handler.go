@@ -2,8 +2,9 @@ package handler
 
 import (
 	"grpc-finance-app/gateway/internal/dto"
-	authpb "grpc-finance-app/proto"
 	"net/http"
+
+	authpb "github.com/dino9611-grpc-expense-app/grpc-expense-proto/proto"
 
 	"github.com/gin-gonic/gin"
 )

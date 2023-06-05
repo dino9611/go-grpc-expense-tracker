@@ -1,14 +1,15 @@
 package models
 
 import (
-	authpb "grpc-finance-app/proto"
 	"grpc-finance-app/services/auth/internal/dto/res"
+
+	authpb "github.com/dino9611-grpc-expense-app/grpc-expense-proto/proto"
 
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID       int
+	ID       int64
 	Email    string `gorm:"unique"`
 	Password string
 	Username string `gorm:"unique"`

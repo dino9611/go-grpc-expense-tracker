@@ -3,11 +3,12 @@ package usecases
 import (
 	"context"
 	"fmt"
-	authpb "grpc-finance-app/proto"
 	"grpc-finance-app/services/auth/internal/dto/req"
 	"grpc-finance-app/services/auth/internal/errs"
 	"grpc-finance-app/services/auth/internal/models"
 	"grpc-finance-app/services/auth/internal/repositories"
+
+	authpb "github.com/dino9611-grpc-expense-app/grpc-expense-proto/proto"
 
 	"golang.org/x/crypto/bcrypt"
 )

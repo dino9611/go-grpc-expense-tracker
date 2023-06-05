@@ -3,9 +3,11 @@ package handler
 import (
 	"context"
 	"errors"
-	authpb "grpc-finance-app/proto"
 	"grpc-finance-app/services/auth/internal/dto/req"
 	"grpc-finance-app/services/auth/internal/errs"
+	"grpc-finance-app/services/auth/internal/utils"
+
+	authpb "github.com/dino9611-grpc-expense-app/grpc-expense-proto/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -42,6 +44,16 @@ func (h *Handler) Login(ctx context.Context, in *authpb.UserLoginReq) (*authpb.U
 	}
 
 	result, err := h.authUseCase.Get(ctx, authdto)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) || errors.Is(err, errs.ErrorPassWrong) {
+			err = status.Error(codes.NotFound, "user not found")
+			return nil, err
+		}
+		err = status.Error(codes.Internal, "internal error")
+		return nil, err
+	}
+
+	err = utils.CreateToken(result)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) || errors.Is(err, errs.ErrorPassWrong) {
